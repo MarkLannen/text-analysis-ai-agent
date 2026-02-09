@@ -32,7 +32,8 @@ class OllamaProvider(BaseLLMProvider):
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt}
-                ]
+                ],
+                options={"num_ctx": 131072}
             )
             return response["message"]["content"]
 
@@ -162,6 +163,21 @@ class LLMService:
         """
         prompt = build_rag_prompt(question, context)
         return self.provider.generate(prompt, SYSTEM_PROMPT)
+
+    def generate_with_system(self, prompt: str, system_prompt: str) -> str:
+        """
+        Generate a response with a custom system prompt.
+        Used for chapter-level analysis where the strict RAG system prompt
+        is not appropriate.
+
+        Args:
+            prompt: User prompt (e.g. chapter summary request with full chapter text)
+            system_prompt: Custom system prompt for this analysis type
+
+        Returns:
+            LLM response
+        """
+        return self.provider.generate(prompt, system_prompt)
 
     def generate_raw(self, prompt: str, system_prompt: Optional[str] = None) -> str:
         """

@@ -86,6 +86,24 @@ def main():
 
     st.success(f"📊 Comparing {len(selected_ids)} documents")
 
+    # Retrieval depth control
+    with st.sidebar:
+        st.subheader("🔎 Retrieval Depth")
+        depth_preset = st.radio(
+            "Context per document",
+            options=["Focused (3)", "Broad (8)", "Comprehensive (15)", "Custom"],
+            index=0,
+            help="More chunks = more context but slower responses"
+        )
+
+        depth_map = {"Focused (3)": 3, "Broad (8)": 8, "Comprehensive (15)": 15}
+        if depth_preset == "Custom":
+            compare_n_results = st.slider("Chunks per document", min_value=1, max_value=30, value=3)
+        else:
+            compare_n_results = depth_map[depth_preset]
+
+        st.caption(f"Retrieving **{compare_n_results}** chunks per document")
+
     st.markdown("---")
 
     # Side-by-side view
@@ -142,7 +160,7 @@ def main():
                     chunks = services["vector"].search(
                         query=question,
                         doc_ids=[doc_id],
-                        n_results=3
+                        n_results=compare_n_results
                     )
 
                     doc = services["document"].get_document(doc_id)

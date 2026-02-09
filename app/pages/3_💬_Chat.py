@@ -72,6 +72,25 @@ def main():
 
         st.markdown("---")
 
+        # Retrieval depth control
+        st.subheader("🔎 Retrieval Depth")
+        depth_preset = st.radio(
+            "How much context to retrieve",
+            options=["Focused (5)", "Broad (15)", "Comprehensive (30)", "Custom"],
+            index=0,
+            help="More chunks = more context but slower responses"
+        )
+
+        depth_map = {"Focused (5)": 5, "Broad (15)": 15, "Comprehensive (30)": 30}
+        if depth_preset == "Custom":
+            n_results = st.slider("Number of chunks", min_value=1, max_value=50, value=5)
+        else:
+            n_results = depth_map[depth_preset]
+
+        st.caption(f"Retrieving **{n_results}** chunks per query")
+
+        st.markdown("---")
+
         # Model info
         llm_config = services["settings"].get_llm_config()
         st.caption(f"**Model:** {llm_config['model']}")
@@ -127,7 +146,7 @@ def main():
                     chunks = services["vector"].search(
                         query=prompt,
                         doc_ids=selected_doc_ids,
-                        n_results=5
+                        n_results=n_results
                     )
 
                     if not chunks:

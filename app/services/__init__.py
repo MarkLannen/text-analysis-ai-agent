@@ -8,6 +8,7 @@ from .llm_service import LLMService
 from .ocr_service import OCRService
 from .screenshot_service import ScreenshotService
 from .comparison_service import ComparisonService
+from .chapter_service import ChapterService
 
 __all__ = [
     'DocumentService',
@@ -15,5 +16,6 @@ __all__ = [
     'LLMService',
     'OCRService',
     'ScreenshotService',
-    'ComparisonService'
+    'ComparisonService',
+    'ChapterService'
 ]

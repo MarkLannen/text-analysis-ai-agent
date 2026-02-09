@@ -59,6 +59,88 @@ Provide a concise summary that captures:
 Keep the summary focused and accurate to the source material."""
 
 
+# System prompt for full-chapter analysis (not RAG-constrained)
+WHOLE_DOC_SYSTEM_PROMPT = """You are a text analysis assistant. You have been given the COMPLETE text of a chapter from a book or document.
+
+Your role is to provide thorough, detailed analysis based on the full chapter text provided. You have the complete chapter text, so you can reference any part of it.
+
+Your responses should be:
+- Accurate to the source material
+- Well-organized and clear
+- Detailed enough to capture the key content of the chapter"""
+
+
+# Template for chapter summaries
+CHAPTER_SUMMARY_TEMPLATE = """Below is the complete text of {chapter_label} from "{doc_name}".
+
+=== CHAPTER TEXT ===
+{chapter_text}
+=== END OF CHAPTER ===
+
+Please provide a comprehensive summary of this chapter (~500 words) covering:
+1. The main narrative arc or argument of the chapter
+2. Key people, places, and events mentioned
+3. Important quotes or passages
+4. How this chapter connects to broader themes of the work
+
+Write the summary in clear, flowing prose."""
+
+
+# Template for extracting timestamped events from a chapter
+CHAPTER_EVENTS_TEMPLATE = """Below is the complete text of {chapter_label} from "{doc_name}".
+
+=== CHAPTER TEXT ===
+{chapter_text}
+=== END OF CHAPTER ===
+
+Extract all events, dates, and time references from this chapter. For each event, provide:
+- **Date/Period**: The date or time period (use "undated" if no specific date is given but a sequence is implied)
+- **Event**: Brief description of what happened
+- **People**: Key people involved
+
+Format as a numbered list. Be thorough - include all events mentioned, even briefly."""
+
+
+# Template for merging per-chapter events into a unified timeline
+TIMELINE_MERGE_TEMPLATE = """Below are events extracted from each chapter of "{doc_name}". Merge them into a single unified chronological timeline.
+
+{chapter_events}
+
+Create a unified chronological timeline:
+1. Order all events by date/period (earliest first)
+2. Remove duplicates (same event mentioned in multiple chapters)
+3. Group events by era or time period where appropriate
+4. Keep descriptions concise but informative
+
+Format the timeline with clear date headings and bullet points for events."""
+
+
+def build_chapter_summary_prompt(chapter_text: str, chapter_label: str, doc_name: str) -> str:
+    """Build a prompt to summarize a single chapter."""
+    return CHAPTER_SUMMARY_TEMPLATE.format(
+        chapter_text=chapter_text,
+        chapter_label=chapter_label,
+        doc_name=doc_name
+    )
+
+
+def build_chapter_events_prompt(chapter_text: str, chapter_label: str, doc_name: str) -> str:
+    """Build a prompt to extract events from a single chapter."""
+    return CHAPTER_EVENTS_TEMPLATE.format(
+        chapter_text=chapter_text,
+        chapter_label=chapter_label,
+        doc_name=doc_name
+    )
+
+
+def build_timeline_merge_prompt(chapter_events: str, doc_name: str) -> str:
+    """Build a prompt to merge per-chapter events into a unified timeline."""
+    return TIMELINE_MERGE_TEMPLATE.format(
+        chapter_events=chapter_events,
+        doc_name=doc_name
+    )
+
+
 def build_rag_prompt(question: str, context: str) -> str:
     """
     Build a RAG prompt from question and context.

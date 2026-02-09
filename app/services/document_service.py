@@ -168,6 +168,39 @@ class DocumentService:
 
         return True
 
+    def save_chapter_metadata(self, doc_id: str, chapters: List[Dict]) -> bool:
+        """
+        Save chapter metadata for a document.
+
+        Args:
+            doc_id: Document ID
+            chapters: List of chapter dicts from ChapterService.detect_chapters
+
+        Returns:
+            True if saved, False if document not found
+        """
+        if doc_id not in self.index["documents"]:
+            return False
+
+        self.index["documents"][doc_id]["chapters"] = chapters
+        self._save_index()
+        return True
+
+    def get_chapter_metadata(self, doc_id: str) -> List[Dict]:
+        """
+        Get cached chapter metadata for a document.
+
+        Args:
+            doc_id: Document ID
+
+        Returns:
+            List of chapter dicts, or empty list if none cached
+        """
+        if doc_id not in self.index["documents"]:
+            return []
+
+        return self.index["documents"][doc_id].get("chapters", [])
+
     def rename_document(self, doc_id: str, new_name: str) -> bool:
         """
         Rename a document.

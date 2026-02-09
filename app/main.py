@@ -55,6 +55,7 @@ def main():
         - 📸 Capture - Import ebooks via OCR
         - 💬 Chat - Ask questions about texts
         - ⚖️ Compare - Compare multiple texts
+        - 📖 Deep Analysis - Chapter summaries & timelines
         - ⚙️ Settings - Configure LLM & options
         """)
 
@@ -95,6 +96,13 @@ def main():
         <div class="feature-card">
             <h3>⚖️ Compare Texts</h3>
             <p>Compare 2 or more texts side-by-side with AI-powered analysis.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="feature-card">
+            <h3>📖 Deep Analysis</h3>
+            <p>Chapter-by-chapter summaries, chronological timelines, and full-chapter Q&A.</p>
         </div>
         """, unsafe_allow_html=True)
 
