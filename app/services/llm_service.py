@@ -20,7 +20,7 @@ class BaseLLMProvider(ABC):
 class OllamaProvider(BaseLLMProvider):
     """Ollama provider for local LLMs."""
 
-    def __init__(self, model: str = "llama3.2"):
+    def __init__(self, model: str = "qwen2.5:14b"):
         self.model = model
 
     def generate(self, prompt: str, system_prompt: str) -> str:
@@ -133,7 +133,7 @@ class LLMService:
 
         # Set default models
         default_models = {
-            "ollama": "llama3.2",
+            "ollama": "qwen2.5:14b",
             "openai": "gpt-4o",
             "anthropic": "claude-sonnet-4-20250514"
         }

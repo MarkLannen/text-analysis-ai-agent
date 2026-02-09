@@ -8,6 +8,9 @@ import sys
 # Add app directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
+from services.document_service import DocumentService
+from config.settings import Settings
+
 # Page config must be first Streamlit command
 st.set_page_config(
     page_title="Text Analysis AI Agent",
@@ -108,13 +111,21 @@ def main():
     st.markdown("---")
     col1, col2, col3 = st.columns(3)
 
+    doc_service = DocumentService()
+    settings = Settings()
+    llm_config = settings.get_llm_config()
+
     with col1:
-        # TODO: Get actual document count from service
-        st.metric("Documents", "0")
+        st.metric("Documents", len(doc_service.list_documents()))
 
     with col2:
-        # TODO: Get from settings
-        st.metric("LLM Provider", "Not configured")
+        provider_labels = {
+            "ollama": "Ollama",
+            "openai": "OpenAI",
+            "anthropic": "Anthropic"
+        }
+        provider = llm_config.get("provider", "ollama")
+        st.metric("LLM Provider", provider_labels.get(provider, provider))
 
     with col3:
         st.metric("Status", "Ready")

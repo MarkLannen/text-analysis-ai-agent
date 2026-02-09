@@ -93,15 +93,34 @@ class ScreenshotService:
         Returns:
             List of window titles
         """
+        import platform
+        import subprocess
+
+        if platform.system() != "Darwin":
+            return []
+
         try:
-            import pyautogui
+            script = '''
+            tell application "System Events"
+                set windowNames to {}
+                repeat with proc in (every process whose visible is true)
+                    repeat with w in (every window of proc)
+                        set end of windowNames to (name of proc) & " - " & (name of w)
+                    end repeat
+                end repeat
+                return windowNames
+            end tell
+            '''
+            result = subprocess.run(
+                ["osascript", "-e", script],
+                capture_output=True, text=True, timeout=5
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return [w.strip() for w in result.stdout.strip().split(", ") if w.strip()]
+        except Exception:
+            pass
 
-            # pyautogui doesn't have window listing, return empty
-            # This would need platform-specific implementation
-            return []
-
-        except ImportError:
-            return []
+        return []
 
     def focus_window(self, window_title: str) -> bool:
         """
@@ -113,9 +132,31 @@ class ScreenshotService:
         Returns:
             True if window was focused
         """
-        # Platform-specific implementation would go here
-        # For now, return False and let user manually focus
-        return False
+        import platform
+        import subprocess
+
+        if platform.system() != "Darwin":
+            return False
+
+        try:
+            script = f'''
+            tell application "System Events"
+                repeat with proc in (every process whose visible is true)
+                    if name of proc contains "{window_title}" then
+                        set frontmost of proc to true
+                        return true
+                    end if
+                end repeat
+            end tell
+            return false
+            '''
+            result = subprocess.run(
+                ["osascript", "-e", script],
+                capture_output=True, text=True, timeout=5
+            )
+            return result.returncode == 0 and "true" in result.stdout.lower()
+        except Exception:
+            return False
 
     def crop_to_content(self, image: Image.Image, padding: int = 10) -> Image.Image:
         """

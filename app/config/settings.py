@@ -41,7 +41,7 @@ class Settings:
         return {
             "llm": {
                 "provider": "ollama",
-                "model": "llama3.2",
+                "model": "qwen2.5:14b",
                 "api_key": None
             },
             "ocr": {

@@ -47,7 +47,7 @@ def main():
     with col2:
         # Model options based on provider
         model_options = {
-            "ollama": ["llama3.2", "llama3.1", "mistral", "mixtral", "phi3", "gemma2"],
+            "ollama": ["qwen2.5:14b", "llama3.2", "llama3.1", "mistral", "mixtral", "phi3", "gemma2"],
             "openai": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "gpt-3.5-turbo"],
             "anthropic": ["claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-opus-20240229", "claude-3-haiku-20240307"]
         }
@@ -204,11 +204,36 @@ def main():
         screenshots_count = len(list(screenshots_dir.glob("*.png"))) if screenshots_dir.exists() else 0
         st.metric("Screenshots Stored", screenshots_count)
 
-    if st.button("🗑️ Clear All Data", type="secondary"):
+    if "confirm_clear" not in st.session_state:
+        st.session_state.confirm_clear = False
+
+    if not st.session_state.confirm_clear:
+        if st.button("🗑️ Clear All Data", type="secondary"):
+            st.session_state.confirm_clear = True
+            st.rerun()
+    else:
         st.warning("This will delete all documents, screenshots, and embeddings. This cannot be undone.")
-        if st.button("⚠️ Confirm Delete All"):
-            # TODO: Implement data clearing
-            st.info("Data clearing not implemented yet")
+        col_confirm, col_cancel = st.columns(2)
+        with col_confirm:
+            if st.button("⚠️ Confirm Delete All", type="primary"):
+                import shutil
+                docs_dir = data_dir / "documents"
+                screenshots_dir_path = data_dir / "screenshots"
+                chromadb_dir = data_dir / "chromadb"
+
+                for d in [docs_dir, screenshots_dir_path, chromadb_dir]:
+                    if d.exists():
+                        shutil.rmtree(d)
+                        d.mkdir(parents=True, exist_ok=True)
+
+                st.session_state.confirm_clear = False
+                st.cache_resource.clear()
+                st.success("✅ All data cleared.")
+                st.rerun()
+        with col_cancel:
+            if st.button("Cancel"):
+                st.session_state.confirm_clear = False
+                st.rerun()
 
 
 if __name__ == "__main__":
